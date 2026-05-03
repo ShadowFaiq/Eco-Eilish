@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "Act": {
+      "title": "Eco Action",
+      "description": "A user-submitted environmental action with proof.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user who submitted the act." },
+        "userName": { "type": "string", "description": "Display name of the user." },
+        "description": { "type": "string", "description": "Description of the act performed." },
+        "imageUrl": { "type": "string", "description": "URL to the proof image." },
+        "votes": { "type": "number", "description": "Count of votes received." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When it was posted." }
+      },
+      "required": ["userId", "userName", "description", "imageUrl", "votes", "timestamp"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "User metadata including credits.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "credits": { "type": "number" },
+        "photoURL": { "type": "string" }
+      },
+      "required": ["displayName", "credits"]
+    },
+    "Vote": {
+      "title": "Act Vote",
+      "description": "Record of a user voting on an act to prevent duplicates.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "actId": { "type": "string" }
+      },
+      "required": ["userId", "actId"]
+    },
+    "MovieReview": {
+      "title": "Movie Review",
+      "description": "A user review and rating for the movie.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhoto": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userName", "rating", "comment", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/acts/{actId}": {
+      "schema": "Act",
+      "description": "Collection of eco-actions."
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles."
+    },
+    "/acts/{actId}/votes/{userId}": {
+      "schema": "Vote",
+      "description": "Votes for a specific act."
+    },
+    "/movieReviews/{reviewId}": {
+      "schema": "MovieReview",
+      "description": "User reviews for the movie."
+    }
+  }
+}

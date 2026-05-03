@@ -1,0 +1,6 @@
+{
+  "name": "Eco-Eilish: The Sanctuary",
+  "description": "An immersive underwater-themed ecosystem for sustainable merchandise, event access, and digital wellness inspired by the 'Hit Me Hard and Soft' era.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["AI-powered Wellness Companion", "Sustainable Merch Store", "Impact Dashboard"]
+}

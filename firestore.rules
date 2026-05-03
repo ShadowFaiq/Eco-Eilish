@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- User Profiles ---
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if false;
+      allow create: if isOwner(userId) && 
+        incoming().keys().hasAll(['displayName', 'credits']) &&
+        incoming().credits == 0;
+      allow update: if isOwner(userId) && 
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL']);
+    }
+
+    // --- Acts ---
+    function isValidAct(data) {
+      return data.userId == request.auth.uid &&
+             data.userName is string && data.userName.size() <= 100 &&
+             data.description is string && data.description.size() <= 1000 &&
+             data.imageUrl is string && data.imageUrl.size() <= 2000 &&
+             data.votes is number && data.votes == 0 &&
+             data.timestamp == request.time;
+    }
+
+    match /acts/{actId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidAct(incoming());
+      
+      // Update logic for voting - handled via subcollection trigger or atomic updates
+      // Here we allow specific increments to 'votes' ONLY if a vote record is created
+      allow update: if isSignedIn() && 
+        incoming().diff(existing()).affectedKeys().hasOnly(['votes']) &&
+        incoming().votes == existing().votes + 1;
+    }
+
+    // --- Votes (Atomic Guard) ---
+    match /acts/{actId}/votes/{userId} {
+      allow create: if isOwner(userId) && 
+        existsAfter(/databases/$(database)/documents/acts/$(actId)) &&
+        getAfter(/databases/$(database)/documents/acts/$(actId)).data.votes == get(/databases/$(database)/documents/acts/$(actId)).data.votes + 1;
+    }
+
+    // --- Movie Reviews ---
+    function isValidReview(data) {
+      return data.userId == request.auth.uid &&
+             data.userName is string && data.userName.size() <= 100 &&
+             (data.userPhoto == null || (data.userPhoto is string && data.userPhoto.size() <= 2000)) &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() <= 2000 &&
+             data.timestamp == request.time;
+    }
+
+    match /movieReviews/{reviewId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidReview(incoming());
+      allow update: if isOwner(existing().userId) && isValidReview(incoming());
+      allow delete: if isOwner(existing().userId);
+    }
+  }
+}

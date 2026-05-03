@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Epilogue", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Epilogue", sans-serif;
+
+  --color-surface-dim: #0c1324;
+  --color-surface-bright: #33394c;
+  --color-surface-container: #191f31;
+  --color-surface-container-high: #23293c;
+  
+  --color-primary-container: #0039B4;
+  --color-on-primary-container: #ffffff;
+  
+  --color-ocean-depths: #050c18;
+  --color-ocean-surface: #0a192f;
+  --color-bioluminescence: #00e5ff;
+}
+
+@layer base {
+  body {
+    @apply bg-ocean-depths text-slate-200 antialiased;
+    background: linear-gradient(180deg, #0a192f 0%, #0c1324 50%, #050c18 100%);
+    background-attachment: fixed;
+  }
+}
+
+.glass-panel {
+  @apply backdrop-blur-2xl border-t border-l border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+  background: rgba(25, 31, 49, 0.4);
+}
+
+.glow-blue {
+  box-shadow: 0 0 20px rgba(0, 57, 180, 0.4);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.3);
+}
+
+.stroke-text {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.8);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
